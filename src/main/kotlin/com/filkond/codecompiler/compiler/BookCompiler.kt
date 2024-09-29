@@ -6,11 +6,11 @@ import org.bukkit.inventory.meta.BookMeta
 
 class BookCompiler : Compiler {
     private val interpreter = Interpreter()
-        get() = field.also { it.reset() }
 
-    override fun compile(player: Player, code: String): Any {
+    @Throws(CompilerException::class)
+    override fun compile(player: Player, args: Array<out String>): Any? {
         val stack = player.inventory.itemInMainHand
-        if (stack.type != org.bukkit.Material.WRITTEN_BOOK || stack.type != org.bukkit.Material.WRITABLE_BOOK) {
+        if (stack.type != org.bukkit.Material.WRITTEN_BOOK && stack.type != org.bukkit.Material.WRITABLE_BOOK) {
             throw CompilerException("Not a book")
         }
 
@@ -20,6 +20,7 @@ class BookCompiler : Compiler {
             builder.append(it)
         }
 
+        interpreter.reset()
         interpreter.set("player", player)
         return interpreter.eval(builder.toString())
     }
